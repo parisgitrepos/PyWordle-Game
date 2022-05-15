@@ -15,22 +15,47 @@ while running:
     game = PyWordle(num_guesses)
     invalid_guess = True
 
-    while guess <= num_guesses and not game.check_game_over():
+    while guess <= num_guesses and not game.check_game_over()['condition']:
 
         while invalid_guess:
             guess_str = input("Make a guess: ")
             print('')
             result = game.make_guess(guess_str)
 
-            if result[0] is True:
+            if result['condition'] is True:
                 invalid_guess = False
             else:
-                print("Invalid guess - " + result[1])
+                print("Invalid guess - " + result['error'])
                 print('')
 
         invalid_guess = True
 
-        if game.check_game_over():
+        board = result['board']
+        color_mapping = result['color_board']
+
+        board_formatted = ''
+
+        for row_index in range(len(board)):
+            for char_index in range(len(board[row_index])):
+                char = board[row_index][char_index]
+                color = color_mapping[row_index][char_index]
+                if char != ' ':
+                    if color == 'LG':
+                        color_code = LIGHT_GREY
+                    elif color == 'G':
+                        color_code = GREEN
+                    else:
+                        color_code = YELLOW
+
+                    board_formatted += color_code+char+END_COLOR+'   '
+
+                else:
+                    board_formatted += '[]   '
+
+            board_formatted += '\n'
+        print(board_formatted)
+
+        if game.check_game_over()['condition']:
             info = game.get_info()
             win = info['guessed_word']
             guesses_taken = info['guesses_taken']
@@ -41,39 +66,6 @@ while running:
             print('Number of Guesses Taken: ' + str(guesses_taken))
             print('Actual Word: ' + str(actual_word))
 
-        else:
-            board = result[1]
-            color_mapping = result[2]
-
-            board_formatted = ''
-
-            for row_index in range(len(board)):
-                for char_index in range(len(board[row_index])):
-                    char = board[row_index][char_index]
-                    color = color_mapping[row_index][char_index]
-                    if char != ' ':
-                        if color == 'B':
-                            color_code = LIGHT_GREY
-                        elif color == 'G':
-                            color_code = GREEN
-                        else:
-                            color_code = YELLOW
-
-                        board_formatted += color_code+char+END_COLOR+'   '
-
-                    else:
-                        board_formatted += '[]   '
-
-                board_formatted += '\n'
-            print(board_formatted)
-
     replay = input('Would you like to play again? (y/n) ')
     if replay.lower() == 'n':
         running = False
-
-
-
-
-
-
-

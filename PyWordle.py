@@ -26,11 +26,11 @@ class PyWordle:
 
     def _is_valid_guess(self, guess: str):
         if self.num_guesses >= self.max_guesses:
-            return [False, "Max guesses made"]
+            return {'condition': False, 'error': "Max guesses made"}
         elif len(guess) != self.num_letters:
-            return [False, "Invalid number of characters"]
+            return {'condition': False, 'error': "Invalid number of characters"}
         else:
-            return [True]
+            return {'condition': True}
 
     def _update_game_board(self, guess: str):
         # Need to reset empty row (i.e. [' ', ' ', ' ', ' ', ' ']) to [] in order to prevent appending to end of former
@@ -42,30 +42,30 @@ class PyWordle:
 
         for char_index in range(len(guess)):
             if guess[char_index] == self.word[char_index]:
-                self.color_board[self.num_guesses-1].append('G')
+                self.color_board[self.num_guesses-1].append('G') # Green
             elif guess[char_index] in self.word:
-                self.color_board[self.num_guesses-1].append('Y')
+                self.color_board[self.num_guesses-1].append('Y') # Yellow
             else:
-                self.color_board[self.num_guesses-1].append('B')
+                self.color_board[self.num_guesses-1].append('LG') # Light grey
 
     def make_guess(self, guess):
         guess = guess.upper()
         is_valid = self._is_valid_guess(guess)
 
-        if not is_valid[0]:
+        if not is_valid['condition']:
             return is_valid
         else:
             self.num_guesses += 1
             self._update_game_board(guess)
-            return [True, self.game_board, self.color_board]
+            return {'condition': True, 'board': self.game_board, 'color_board': self.color_board}
 
     def check_game_over(self):
         if self.color_board[self.num_guesses-1] == self.win_state:
-            return True
+            return {'condition': True}
         elif self.num_guesses >= self.max_guesses:
-            return True
+            return {'condition': True}
         else:
-            return False
+            return {'condition': False}
 
     def get_info(self):
         if self.color_board[self.num_guesses-1] == self.win_state:
