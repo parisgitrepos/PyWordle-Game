@@ -12,7 +12,7 @@ while running:
     num_guesses = int(input('Welcome to PyWordle! How many guesses would you like to have: '))
     guess = 1
     print('')
-    game = PyWordle(num_guesses)
+    game = PyWordle(num_guesses, 5)
     invalid_guess = True
 
     while guess <= num_guesses and not game.check_game_over()['condition']:

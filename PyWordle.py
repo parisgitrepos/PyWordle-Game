@@ -1,7 +1,11 @@
 import linecache
 import random
+from bs4 import BeautifulSoup
+import requests
+
 
 class PyWordle:
+
     def __init__(self, max_guesses = 5, num_letters = 5):
         self.max_guesses = max_guesses
         self.num_letters = num_letters
@@ -18,17 +22,24 @@ class PyWordle:
             self.word = linecache.getline("5LetterWords.txt", random_num).upper()
 
         for i in range(max_guesses):
-            self.game_board.append([' ', ' ', ' ', ' ', ' '])
-            self.color_board.append([' ', ' ', ' ', ' ', ' '])
+            self.game_board.append([' ' for i in range(self.num_letters)])
+            self.color_board.append([' ' for i in range(self.num_letters)])
 
         for i in range(num_letters):
             self.win_state.append('G')
 
     def _is_valid_guess(self, guess: str):
+        dictionary_url = 'https://wordreference.com/definition/' + guess # Checks word against wordreference.com dictionary
+        dictionary_call = requests.get(dictionary_url)
+        dictionary_call = BeautifulSoup(dictionary_call.text, 'html.parser')
+        dictionary_call = dictionary_call.find_all(id = 'noEntryFound') # Looks for marker 'noEntryFound' signifying invalid word
+
         if self.num_guesses >= self.max_guesses:
             return {'condition': False, 'error': "Max guesses made"}
         elif len(guess) != self.num_letters:
             return {'condition': False, 'error': "Invalid number of characters"}
+        elif len(dictionary_call) > 0:
+            return {'condition': False, 'error': f'"{guess}" is not a valid word'}
         else:
             return {'condition': True}
 
