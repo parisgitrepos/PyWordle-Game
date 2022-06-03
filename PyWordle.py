@@ -6,7 +6,7 @@ import requests
 
 class PyWordle:
 
-    def __init__(self, max_guesses = 5, num_letters = 5):
+    def __init__(self, max_guesses = 5, num_letters = 5) -> None:
         self.max_guesses = max_guesses
         self.num_letters = num_letters
         self.num_guesses = 0
@@ -28,7 +28,7 @@ class PyWordle:
         for i in range(num_letters):
             self.win_state.append('G')
 
-    def _is_valid_guess(self, guess: str):
+    def _is_valid_guess(self, guess: str) -> dict:
         dictionary_url = 'https://wordreference.com/definition/' + guess # Checks word against wordreference.com dictionary
         dictionary_call = requests.get(dictionary_url)
         dictionary_call = BeautifulSoup(dictionary_call.text, 'html.parser')
@@ -43,7 +43,7 @@ class PyWordle:
         else:
             return {'condition': True}
 
-    def _update_game_board(self, guess: str):
+    def _update_game_board(self, guess: str) -> None:
         # Need to reset empty row (i.e. [' ', ' ', ' ', ' ', ' ']) to [] in order to prevent appending to end of former
         self.game_board[self.num_guesses - 1] = []
         self.color_board[self.num_guesses - 1] = []
@@ -59,7 +59,7 @@ class PyWordle:
             else:
                 self.color_board[self.num_guesses-1].append('LG') # Light grey
 
-    def make_guess(self, guess):
+    def make_guess(self, guess) -> dict:
         guess = guess.upper()
         is_valid = self._is_valid_guess(guess)
 
@@ -70,7 +70,7 @@ class PyWordle:
             self._update_game_board(guess)
             return {'condition': True, 'board': self.game_board, 'color_board': self.color_board}
 
-    def check_game_over(self):
+    def check_game_over(self) -> dict:
         if self.color_board[self.num_guesses-1] == self.win_state:
             return {'condition': True}
         elif self.num_guesses >= self.max_guesses:
@@ -78,7 +78,7 @@ class PyWordle:
         else:
             return {'condition': False}
 
-    def get_info(self):
+    def get_info(self) -> dict:
         if self.color_board[self.num_guesses-1] == self.win_state:
             win = True
         else:
