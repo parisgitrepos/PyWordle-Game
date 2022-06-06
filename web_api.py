@@ -83,13 +83,15 @@ def create_game():
     game_id = str(random.randint(15, 64))
     new_game = PyWordle()
     db_game_insert(game_id = game_id, game_obj = new_game)
-    return flask.jsonify({'game_id': game_id}, 201)
+    return flask.jsonify({'game_id': game_id})
 
 
 @app.route('/make_guess', methods=['POST'])
 def make_guess():
     try:
         game_id = request.get_json(force = True)['game_id']
+        # Must convert game_id to str when querying MongoDB
+        game_id = str(game_id) if type(game_id) == int else game_id
         guess = request.get_json(force = True)['guess']
 
         game = db_game_read(game_id)
@@ -98,25 +100,45 @@ def make_guess():
 
         db_game_update(game_id, game)
 
-        return flask.jsonify({'game_response': game_response}, 200)
+        return flask.jsonify({'game_response': game_response})
 
     except:
-        return flask.jsonify(400)
+        return flask.jsonify('Bad request')
 
 
 @app.route('/game_info', methods = ['POST'])
 def game_info():
     try:
         game_id = request.get_json(force = True)['game_id']
+        # Must convert game_id to str when querying MongoDB
+        game_id = str(game_id) if type(game_id) == int else game_id
+
         game = db_game_read(game_id)
         game = deserialize_game(game)
         game_info_response = game.get_info()
-        print(game_info_response)
-        print(flask.jsonify({'game_info':game_info_response}))
-        return flask.jsonify({'game_info': game_info_response}, 200)
+
+        return flask.jsonify({'game_response': game_info_response})
 
     except:
-        return flask.jsonify(400)
+        return flask.jsonify('Bad request')
+
+
+@app.route('/check_game_over', methods = ['POST'])
+def check_game_over():
+    try:
+        game_id = request.get_json(force = True)['game_id']
+        # Must convert game_id to str when querying MongoDB
+        game_id = str(game_id) if type(game_id) == int else game_id
+
+        game = db_game_read(game_id)
+        game = deserialize_game(game)
+        check_game_over_response = game.check_game_over()
+
+        return flask.jsonify({'game_response': check_game_over_response})
+
+    except:
+        return flask.jsonify('Bad request')
+
 
 if __name__ == '__main__':
     app.run()
